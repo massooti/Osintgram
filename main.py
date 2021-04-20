@@ -81,7 +81,10 @@ def cmdlist():
     print("Get a list of user who commented target's photos")
     pc.printout("wtagged\t\t")
     print("Get a list of user who tagged target")
-
+    pc.printout("follow\t")
+    print("Request to the list of followers who tag have")
+    pc.printout("ufollow\t\t")
+    print("Unfollow the following list")
 
 def signal_handler(sig, frame):
     pc.printout("\nGoodbye!\n", pc.RED)
@@ -148,7 +151,9 @@ commands = {
     'tagged':           api.get_people_tagged_by_user,
     'target':           api.change_target,
     'wcommented':       api.get_people_who_commented,
-    'wtagged':          api.get_people_who_tagged
+    'wtagged':          api.get_people_who_tagged,
+    'follow':           api.follow_who_followed_target,
+    'ufollow':          api.unfollow_following
 }
 
 signal.signal(signal.SIGINT, signal_handler)

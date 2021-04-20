@@ -363,6 +363,80 @@ class Osintgram:
 
         print(t)
 
+    def follow_who_followed_target(self):
+       
+        _followers = []
+        followers = []
+        rank_token = AppClient.generate_uuid()
+        data = self.api.user_following(str(self.target_id), rank_token=rank_token)
+
+        _followers.extend(data.get('users', []))
+
+        next_max_id = data.get('next_max_id')
+        n = 1
+        max_number = 10
+        while next_max_id:
+            n += 1
+            if n < max_number:
+                sys.stdout.write("\rCatched %i followers" % len(_followers))
+                sys.stdout.flush()
+                results = self.api.user_followers(str(self.target_id), rank_token=rank_token, max_id=next_max_id)
+                _followers.extend(results.get('users', []))
+                next_max_id = results.get('next_max_id')
+            elif n >= max_number:
+                break
+                
+        print("\n")
+            
+        for user in _followers:
+            u = {
+                'id': user['pk'],
+                'username': user['username'],
+                'full_name': user['full_name']
+            }
+            followers.append(u)
+
+        for follow in _followers:
+            self.api.friendships_create(follow['pk']) 
+            pc.printout("Request send to {} users...\n" . format(follow['username']), pc.MAGENTA)
+        print("\n")
+        pc.printout("Whooooo... {} request sent totally...\n" . format(max_number))
+
+    def unfollow_following(self):
+        pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#######################################################################################
     def get_followings(self):
         if self.check_private_profile():
             return
