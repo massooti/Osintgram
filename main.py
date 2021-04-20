@@ -9,8 +9,8 @@ import signal
 is_windows = False
 
 try:
-    import gnureadline  
-except: 
+    import readline
+except:
     is_windows = True
     import pyreadline
 
@@ -56,7 +56,7 @@ def cmdlist():
     pc.printout("fwersnumber\t")
     print("Get phone number of target followers")
     pc.printout("fwingsnumber\t")
-    print("Get phone number of users followed by target")    
+    print("Get phone number of users followed by target")
     pc.printout("hashtags\t")
     print("Get hashtags used by target")
     pc.printout("info\t\t")
@@ -105,8 +105,8 @@ if is_windows:
     pyreadline.Readline().parse_and_bind("tab: complete")
     pyreadline.Readline().set_completer(completer)
 else:
-    gnureadline.parse_and_bind("tab: complete")
-    gnureadline.set_completer(completer)
+    readline.parse_and_bind("tab: complete")
+    readline.set_completer(completer)
 
 printlogo()
 
@@ -156,17 +156,17 @@ if is_windows:
     pyreadline.Readline().parse_and_bind("tab: complete")
     pyreadline.Readline().set_completer(completer)
 else:
-    gnureadline.parse_and_bind("tab: complete")
-    gnureadline.set_completer(completer)
+    readline.parse_and_bind("tab: complete")
+    readline.set_completer(completer)
 
 while True:
     pc.printout("Run a command: ", pc.YELLOW)
     cmd = input()
 
     _cmd = commands.get(cmd)
-    
+
     if _cmd:
-        _cmd()    
+        _cmd()
     elif cmd == "FILE=y":
         api.set_write_file(True)
     elif cmd == "FILE=n":
