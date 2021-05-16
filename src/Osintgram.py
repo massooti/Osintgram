@@ -364,7 +364,7 @@ class Osintgram:
         print(t)
 
     def follow_who_followed_target(self):
-       
+           
         _followers = []
         followers = []
         rank_token = AppClient.generate_uuid()
@@ -398,13 +398,51 @@ class Osintgram:
 
         for follow in _followers:
             self.api.friendships_create(follow['pk']) 
-            pc.printout("Request send to {} users...\n" . format(follow['username']), pc.MAGENTA)
+            pc.printout("Request send to {} user...\n" . format(follow['username']), pc.MAGENTA)
         print("\n")
         pc.printout("Whooooo... {} request sent totally...\n" . format(max_number))
 
     def unfollow_following(self):
-        pass
+          
+        _followings = []
+        followings = []
+        rank_token = AppClient.generate_uuid()
+        data = self.api.user_following(str(self.target_id), rank_token=rank_token)
 
+        _followings.extend(data.get('users', []))
+
+        next_max_id = data.get('next_max_id')
+        n = 1
+        max_number = 10
+        while next_max_id:
+            n += 1
+            if n < max_number:
+                sys.stdout.write("\rCatched %i followings" % len(_followings))
+                sys.stdout.flush()
+                results = self.api.user_followers(str(self.target_id), rank_token=rank_token, max_id=next_max_id)
+                _followings.extend(results.get('users', []))
+                next_max_id = results.get('next_max_id')
+            elif n >= max_number:
+                break
+                
+        print("\n")
+        whitelist = open("config/whitelist.txt").read().splitlines()
+        for user in _followings:
+            u = {
+                'id': user['pk'],
+                'username': user['username'],
+                'full_name': user['full_name']
+            }
+            followings.append(u)
+        count = 0
+        for unfollow in _followings:
+            if unfollow not in whitelist:
+                 count += 1
+                 self.api.friendships_destroy(unfollow['pk']) 
+                 pc.printout("{} - Request unfollow to {} user...\n" . format(count,unfollow['username']), pc.MAGENTA)
+                 
+        print("\n")
+        pc.printout("Whooooo... {} users unfollowed totally...\n" . format(max_number))
 
 
 
