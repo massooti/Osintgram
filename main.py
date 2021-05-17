@@ -17,38 +17,25 @@ except:
 
 
 def printlogo():
-    pc.printout("________         .__        __                               \n", pc.YELLOW)
-    pc.printout("\_____  \   _____|__| _____/  |_  ________________    _____  \n", pc.YELLOW)
-    pc.printout(" /   |   \ /  ___/  |/    \   __\/ ___\_  __ \__  \  /     \ \n", pc.YELLOW)
-    pc.printout("/    |    \\\___ \|  |   |  \  | / /_/  >  | \// __ \|  Y Y  \\\n", pc.YELLOW)
-    pc.printout("\_______  /____  >__|___|  /__| \___  /|__|  (____  /__|_|  /\n", pc.YELLOW)
-    pc.printout("        \/     \/        \/    /_____/            \/      \/ \n", pc.YELLOW)
+
+    pc.printout(""" 
+ _           _        _____                         ______       _   
+(_)         | |      |  __ \                        | ___ \     | |  
+ _ _ __  ___| |_ __ _| |  \/ ___ _ __ __ _ _ __ ___ | |_/ / ___ | |_ 
+| | '_ \/ __| __/ _` | | __ / _ \ '__/ _` | '_ ` _ \| ___ \/ _ \| __|
+| | | | \__ \ || (_| | |_\ \  __/ | | (_| | | | | | | |_/ / (_) | |_ 
+|_|_| |_|___/\__\__,_|\____/\___|_|  \__,_|_| |_| |_\____/ \___/ \__|
+                                                                     
+                                                                     """, pc.YELLOW)
     print('\n')
-    pc.printout("Version 1.2 - Developed by Massooti\n\n", pc.YELLOW)
+    pc.printout("Version 1.2 - Developed by Massooti\n\n", pc.MAGENTA)
     pc.printout("Type 'list' to show all allowed commands\n")
     pc.printout("Type 'FILE=y' to save results to files like '<target username>_<command>.txt (default is disabled)'\n")
     pc.printout("Type 'FILE=n' to disable saving to files'\n")
     pc.printout("Type 'JSON=y' to export results to a JSON files like '<target username>_<command>.json (default is "
                 "disabled)'\n")
     pc.printout("Type 'JSON=n' to disable exporting to files'\n")
-
-
-def InitialLogin():
-
-     pc.printout("please enter your username and password")
-     parser = argparse.ArgumentParser()
-    #  subparser = parser.add_subparsers(dest='command')
-    #  login = subparser.add_parser('login')
-     parser.add_argument('--username', type=str, required=False)
-     parser.add_argument('--password', type=str, required=False)
-     args = parser.parse_args()
-    #  Osintgram.login(Osintgram, args.username, args.password)
      
-     with open('config/credentials.ini', 'a') as file:
-         file.write('username = ' + args.username + '\n' + 'password = ' + args.password)
-
-          
-
 
 def cmdlist():
     pc.printout("FILE=y/n\t")
@@ -128,12 +115,6 @@ if is_windows:
 else:
     readline.parse_and_bind("tab: complete")
     readline.set_completer(completer)
-
-settings_file = "config/settings.json"
-if not os.path.isfile(settings_file):
-    InitialLogin()
-else:
-     pass
 
 printlogo()
 
