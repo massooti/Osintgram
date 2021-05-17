@@ -30,8 +30,9 @@ class Osintgram:
     target = ""
     writeFile = False
     jsonDump = False
+    numberUser = 0
 
-    def __init__(self, target, is_file, is_json):
+    def __init__(self, target, is_file, is_json, is_number):
         u = config.getUsername()
         p = config.getPassword()
         print("\nAttempt to login...")
@@ -39,6 +40,7 @@ class Osintgram:
         self.setTarget(target)
         self.writeFile = is_file
         self.jsonDump = is_json
+        self.numberUser = is_number
 
     def setTarget(self, target):
         self.target = target
@@ -374,7 +376,7 @@ class Osintgram:
 
         next_max_id = data.get('next_max_id')
         n = 1
-        max_number = 10
+        max_number = self.numberUser
         while next_max_id:
             n += 1
             if n < max_number:
@@ -1188,6 +1190,11 @@ class Osintgram:
 
         self.jsonDump = flag
 
+
+    def setUserNumber(self, number):
+        self.setUserNumber = number
+        
+        pc.printout('number of loop is set to ' + str(self.setUserNumber) + '\n' , pc.GREEN)
     def login(self, u, p):
         try:
             settings_file = "config/settings.json"

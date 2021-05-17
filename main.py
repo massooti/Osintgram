@@ -124,11 +124,11 @@ parser.add_argument('id', type=str,  # var = id
                     help='username')
 parser.add_argument('-j', '--json', help='save commands output as JSON file', action='store_true')
 parser.add_argument('-f', '--file', help='save output in a file', action='store_true')
+parser.add_argument('-n', '--number', help='save output in a file', action='store_true')
 
 args = parser.parse_args()
 
-api = Osintgram(args.id, args.file, args.json)
-
+api = Osintgram(args.id, args.file, args.json, args.number)
 
 commands = {
     'list':             cmdlist,
@@ -157,8 +157,8 @@ commands = {
     'target':           api.change_target,
     'wcommented':       api.get_people_who_commented,
     'wtagged':          api.get_people_who_tagged,
-    'follow':           api.follow_who_followed_target,
-    'ufollow':          api.unfollow_following
+    # 'follow':           api.follow_who_followed_target,
+    # 'ufollow':          api.unfollow_following
 }
 
 signal.signal(signal.SIGINT, signal_handler)
@@ -185,6 +185,12 @@ while True:
         api.set_json_dump(True)
     elif cmd == "JSON=n":
         api.set_json_dump(False)
+    elif cmd == 'follow':
+        pc.printout("enter number : ", pc.CYAN)
+        num = int(input())
+        api.setUserNumber(num)
+    elif cmd =='SETNUM=d':
+        api.setUserNumber(0)
     elif cmd == "":
         print("")
     else:
