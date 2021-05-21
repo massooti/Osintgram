@@ -124,11 +124,10 @@ parser.add_argument('id', type=str,  # var = id
                     help='username')
 parser.add_argument('-j', '--json', help='save commands output as JSON file', action='store_true')
 parser.add_argument('-f', '--file', help='save output in a file', action='store_true')
-parser.add_argument('-n', '--number', help='save output in a file', action='store_true')
 
 args = parser.parse_args()
 
-api = Osintgram(args.id, args.file, args.json, args.number)
+api = Osintgram(args.id, args.file, args.json)
 
 commands = {
     'list':             cmdlist,
@@ -188,9 +187,11 @@ while True:
     elif cmd == 'follow':
         pc.printout("enter number : ", pc.CYAN)
         num = int(input())
-        api.setUserNumber(num)
-    elif cmd =='SETNUM=d':
-        api.setUserNumber(0)
+        api.follow_who_followed_target(num)
+    elif cmd =='unfollow':
+        pc.printout("enter number : ", pc.CYAN)
+        num = int(input())
+        api.unfollow_following(num)
     elif cmd == "":
         print("")
     else:

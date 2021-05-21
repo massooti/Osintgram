@@ -30,9 +30,9 @@ class Osintgram:
     target = ""
     writeFile = False
     jsonDump = False
-    numberUser = 0
 
-    def __init__(self, target, is_file, is_json, is_number):
+
+    def __init__(self, target, is_file, is_json):
         u = config.getUsername()
         p = config.getPassword()
         print("\nAttempt to login...")
@@ -40,7 +40,7 @@ class Osintgram:
         self.setTarget(target)
         self.writeFile = is_file
         self.jsonDump = is_json
-        self.numberUser = is_number
+ 
 
     def setTarget(self, target):
         self.target = target
@@ -365,7 +365,7 @@ class Osintgram:
 
         print(t)
 
-    def follow_who_followed_target(self):
+    def follow_who_followed_target(self, number):
            
         _followers = []
         followers = []
@@ -376,16 +376,17 @@ class Osintgram:
 
         next_max_id = data.get('next_max_id')
         n = 1
-        max_number = self.numberUser
+       
         while next_max_id:
             n += 1
-            if n < max_number:
+            if n < number:
                 sys.stdout.write("\rCatched %i followers" % len(_followers))
                 sys.stdout.flush()
                 results = self.api.user_followers(str(self.target_id), rank_token=rank_token, max_id=next_max_id)
                 _followers.extend(results.get('users', []))
                 next_max_id = results.get('next_max_id')
-            elif n >= max_number:
+                print(n)
+            elif n >= number:
                 break
                 
         print("\n")
@@ -402,9 +403,9 @@ class Osintgram:
             self.api.friendships_create(follow['pk']) 
             pc.printout("Request send to {} user...\n" . format(follow['username']), pc.MAGENTA)
         print("\n")
-        pc.printout("Whooooo... {} request sent totally...\n" . format(max_number))
+        pc.printout("Whooooo... {} request sent totally...\n" . format(number))
 
-    def unfollow_following(self):
+    def unfollow_following(self, number):
           
         _followings = []
         followings = []
@@ -415,16 +416,16 @@ class Osintgram:
 
         next_max_id = data.get('next_max_id')
         n = 1
-        max_number = 10
+     
         while next_max_id:
             n += 1
-            if n < max_number:
+            if n < number:
                 sys.stdout.write("\rCatched %i followings" % len(_followings))
                 sys.stdout.flush()
                 results = self.api.user_followers(str(self.target_id), rank_token=rank_token, max_id=next_max_id)
                 _followings.extend(results.get('users', []))
                 next_max_id = results.get('next_max_id')
-            elif n >= max_number:
+            elif n >= number:
                 break
                 
         print("\n")
@@ -444,7 +445,7 @@ class Osintgram:
                  pc.printout("{} - Request unfollow to {} user...\n" . format(count,unfollow['username']), pc.MAGENTA)
                  
         print("\n")
-        pc.printout("Whooooo... {} users unfollowed totally...\n" . format(max_number))
+        pc.printout("Whooooo... {} users unfollowed totally...\n" . format(number))
 
 
 
@@ -1190,11 +1191,6 @@ class Osintgram:
 
         self.jsonDump = flag
 
-
-    def setUserNumber(self, number):
-        self.setUserNumber = number
-        
-        pc.printout('number of loop is set to ' + str(self.setUserNumber) + '\n' , pc.GREEN)
     def login(self, u, p):
         try:
             settings_file = "config/settings.json"
