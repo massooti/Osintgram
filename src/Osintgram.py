@@ -17,7 +17,7 @@ from prettytable import PrettyTable
 
 from src import printcolors as pc
 from src import config
-
+import numpy
 
 class Osintgram:
     api = None
@@ -373,16 +373,25 @@ class Osintgram:
         data = self.api.user_following(str(self.target_id), rank_token=rank_token)
 
         _followers.extend(data.get('users', []))
+        _followers = numpy.array(_followers)
+        _followers1 = _followers[:number]
 
+        # if (data.get('big_list') == True) :
+        #     next_max_id = int(data.get('next_max_id') / 10)
+        # else:
+        #     next_max_id = number
+      
         next_max_id = data.get('next_max_id')
+
         n = 1
-       
         while next_max_id:
             n += 1
             if n < number:
-                sys.stdout.write("\rCatched %i followers" % len(_followers))
+                sys.stdout.write("\rCatched %i followers" % len(_followers1))
                 sys.stdout.flush()
                 results = self.api.user_followers(str(self.target_id), rank_token=rank_token, max_id=next_max_id)
+                print(results)
+                exit()
                 _followers.extend(results.get('users', []))
                 next_max_id = results.get('next_max_id')
                 print(n)
@@ -391,7 +400,7 @@ class Osintgram:
                 
         print("\n")
             
-        for user in _followers:
+        for user in _followers1:
             u = {
                 'id': user['pk'],
                 'username': user['username'],
@@ -399,7 +408,7 @@ class Osintgram:
             }
             followers.append(u)
 
-        for follow in _followers:
+        for follow in _followers1:
             self.api.friendships_create(follow['pk']) 
             pc.printout("Request send to {} user...\n" . format(follow['username']), pc.MAGENTA)
         print("\n")
@@ -418,19 +427,22 @@ class Osintgram:
         n = 1
      
         while next_max_id:
-            n += 1
-            if n < number:
+            # n += 1
+            # if n < number:
                 sys.stdout.write("\rCatched %i followings" % len(_followings))
                 sys.stdout.flush()
                 results = self.api.user_followers(str(self.target_id), rank_token=rank_token, max_id=next_max_id)
                 _followings.extend(results.get('users', []))
                 next_max_id = results.get('next_max_id')
-            elif n >= number:
-                break
                 
+            # elif n >= number:
+            #     break
+        print(len(_followings))
+        exit()
         print("\n")
         whitelist = open("config/whitelist.txt").read().splitlines()
         for user in _followings:
+            
             u = {
                 'id': user['pk'],
                 'username': user['username'],
