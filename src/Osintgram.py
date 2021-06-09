@@ -30,6 +30,7 @@ class Osintgram:
     target = ""
     writeFile = False
     jsonDump = False
+    currentUser = None
 
 
     def __init__(self, target, is_file, is_json):
@@ -40,7 +41,12 @@ class Osintgram:
         self.setTarget(target)
         self.writeFile = is_file
         self.jsonDump = is_json
+        self.currentUser = self.currentUser()
  
+
+    def currentUser(self):
+        """Get current user info"""
+        return self.api.authenticated_user_id
 
     def setTarget(self, target):
         self.target = target
@@ -365,82 +371,70 @@ class Osintgram:
 
         print(t)
 
-    def follow_who_followed_target(self, number):
-           
+    def follow_who_followed_target(self):
+        pc.printout("enter a number : ", pc.CYAN)
+        number = int(input())  
+        
         _followers = []
         followers = []
         rank_token = AppClient.generate_uuid()
         data = self.api.user_following(str(self.target_id), rank_token=rank_token)
 
-        _followers.extend(data.get('users', []))
-        _followers = numpy.array(_followers)
-        _followers1 = _followers[:number]
-
-        # if (data.get('big_list') == True) :
-        #     next_max_id = int(data.get('next_max_id') / 10)
-        # else:
-        #     next_max_id = number
-      
+        _followers.extend(data.get('users', []))     
         next_max_id = data.get('next_max_id')
 
-        n = 1
         while next_max_id:
-            n += 1
-            if n < number:
-                sys.stdout.write("\rCatched %i followers" % len(_followers1))
-                sys.stdout.flush()
-                results = self.api.user_followers(str(self.target_id), rank_token=rank_token, max_id=next_max_id)
-                print(results)
-                exit()
-                _followers.extend(results.get('users', []))
-                next_max_id = results.get('next_max_id')
-                print(n)
-            elif n >= number:
-                break
-                
+            sys.stdout.write("\rCatched %i followers" % len(_followers))
+            sys.stdout.flush()
+            results = self.api.user_followers(str(self.target_id), rank_token=rank_token, max_id=next_max_id)
+            _followers.extend(results.get('users', []))
+            next_max_id = results.get('next_max_id')
+
         print("\n")
             
-        for user in _followers1:
+        for user in _followers:
             u = {
                 'id': user['pk'],
                 'username': user['username'],
                 'full_name': user['full_name']
             }
             followers.append(u)
-
-        for follow in _followers1:
-            self.api.friendships_create(follow['pk']) 
-            pc.printout("Request send to {} user...\n" . format(follow['username']), pc.MAGENTA)
+        n = 1 
+        for follow in _followers:
+            if n <= number:
+                n += 1
+                self.api.friendships_create(follow['pk']) 
+                pc.printout("Request send to {} user...\n" . format(follow['username']), pc.MAGENTA)
+            else:
+                break
+                
         print("\n")
         pc.printout("Whooooo... {} request sent totally...\n" . format(number))
 
-    def unfollow_following(self, number):
-          
+    def unfollow_following(self):
+        pc.printout("enter a number : ", pc.CYAN)
+        number = int(input())    
         _followings = []
         followings = []
+        whiteListUsers = []
         rank_token = AppClient.generate_uuid()
-        data = self.api.user_following(str(self.target_id), rank_token=rank_token)
-
+        currentUser = self.api.authenticated_user_id
+        data = self.api.user_following(str(currentUser), rank_token=rank_token)
         _followings.extend(data.get('users', []))
 
         next_max_id = data.get('next_max_id')
-        n = 1
-     
+       
         while next_max_id:
-            # n += 1
-            # if n < number:
                 sys.stdout.write("\rCatched %i followings" % len(_followings))
                 sys.stdout.flush()
-                results = self.api.user_followers(str(self.target_id), rank_token=rank_token, max_id=next_max_id)
+                results = self.api.user_followers(str(currentUser), rank_token=rank_token, max_id=next_max_id)
                 _followings.extend(results.get('users', []))
                 next_max_id = results.get('next_max_id')
                 
-            # elif n >= number:
-            #     break
-        print(len(_followings))
-        exit()
         print("\n")
-        whitelist = open("config/whitelist.txt").read().splitlines()
+        with open('config/whitelist.txt', 'r') as file:
+            whitelist = [line.rstrip('\n') for line in file]
+        file.close()
         for user in _followings:
             
             u = {
@@ -449,17 +443,61 @@ class Osintgram:
                 'full_name': user['full_name']
             }
             followings.append(u)
+
+        for node in whitelist:
+            n = node
+            whiteListUsers.append(n)
+            
+
+
         count = 0
-        for unfollow in _followings:
-            if unfollow not in whitelist:
+        for unfollow in _followings:   
+            if unfollow['username'] not in whiteListUsers and count <= number:
                  count += 1
                  self.api.friendships_destroy(unfollow['pk']) 
                  pc.printout("{} - Request unfollow to {} user...\n" . format(count,unfollow['username']), pc.MAGENTA)
-                 
+            elif unfollow in whitelist:
+                pass    
         print("\n")
         pc.printout("Whooooo... {} users unfollowed totally...\n" . format(number))
 
 
+    def add_acc_whitelist(self):
+        pc.printout("enter username : ", pc.CYAN)
+        usr = input()
+        with open('config/whitelist.txt', 'a') as file:
+            file.write(usr + '\n')
+        pc.printout("username  {} added to whitelist ...\n" . format(usr))
+
+    def show_accs_whitelist(self):
+        userWhiteList = []
+        with open('config/whitelist.txt', 'r') as file:
+                lines = file.readlines()
+        file.close()
+        count = 0
+        for user in lines:
+            count += 1
+            u = {
+                '#' : count,
+                'username': user,
+            }
+            userWhiteList.append(u)
+
+        t = PrettyTable(['#', 'Username'])
+        t.align["#"] = "l"
+        t.align["Username"] = "l"
+   
+        for node in userWhiteList:
+            t.add_row([node['#'], node['username']])
+
+           
+        print(t)
+
+    def truncate_whitelist(self):
+        with open('config/whitelist.txt', 'w') as file:
+           file.truncate()
+        pc.printout("your whitlist truncated successfully...")
+        print('\n')
 
 
 

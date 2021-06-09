@@ -88,8 +88,14 @@ def cmdlist():
     print("Get a list of user who tagged target")
     pc.printout("follow\t")
     print("Request to the list of followers who tag have")
-    pc.printout("ufollow\t\t")
+    pc.printout("unfollow\t\t")
     print("Unfollow the following list")
+    pc.printout("wadd\t")
+    print("add account to whitlist")
+    pc.printout("wshow\t")
+    print("show white list")
+    pc.printout("wdel\t\t")
+    print("delete white list")
 
 def signal_handler(sig, frame):
     pc.printout("\nGoodbye!\n", pc.RED)
@@ -156,8 +162,11 @@ commands = {
     'target':           api.change_target,
     'wcommented':       api.get_people_who_commented,
     'wtagged':          api.get_people_who_tagged,
-    # 'follow':           api.follow_who_followed_target,
-    # 'ufollow':          api.unfollow_following
+    'follow':           api.follow_who_followed_target,
+    'unfollow':         api.unfollow_following,
+    'wadd':             api.add_acc_whitelist,
+    'wshow':            api.show_accs_whitelist,
+    'wdel':             api.truncate_whitelist,
 }
 
 signal.signal(signal.SIGINT, signal_handler)
@@ -184,14 +193,14 @@ while True:
         api.set_json_dump(True)
     elif cmd == "JSON=n":
         api.set_json_dump(False)
-    elif cmd == 'follow':
-        pc.printout("enter number : ", pc.CYAN)
-        num = int(input())
-        api.follow_who_followed_target(num)
-    elif cmd =='unfollow':
-        pc.printout("enter number : ", pc.CYAN)
-        num = int(input())
-        api.unfollow_following(num)
+    # elif cmd == 'follow':
+    #     pc.printout("enter number : ", pc.CYAN)
+    #     num = int(input())
+    #     api.follow_who_followed_target(num)
+    # elif cmd =='unfollow':
+    #     pc.printout("enter number : ", pc.CYAN)
+    #     num = int(input())
+    #     api.unfollow_following(num)
     elif cmd == "":
         print("")
     else:
