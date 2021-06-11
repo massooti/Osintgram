@@ -33,20 +33,21 @@ class Osintgram:
     currentUser = None
 
 
-    def __init__(self, target, is_file, is_json):
+    def __init__(self, is_file, is_json):
         u = config.getUsername()
         p = config.getPassword()
         print("\nAttempt to login...")
         self.login(u, p)
-        self.setTarget(target)
+        # self.setTarget(target)
         self.writeFile = is_file
         self.jsonDump = is_json
-        self.currentUser = self.currentUser()
  
+    def  set_target(self):
+        pc.printout("enter target username : ", pc.CYAN)
+        usr = input()
+        self.setTarget(target)
+        pc.printout("user target set ", pc.CYAN)
 
-    def currentUser(self):
-        """Get current user info"""
-        return self.api.authenticated_user_id
 
     def setTarget(self, target):
         self.target = target
