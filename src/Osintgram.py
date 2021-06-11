@@ -448,8 +448,6 @@ class Osintgram:
             n = node
             whiteListUsers.append(n)
             
-
-
         count = 0
         for unfollow in _followings:   
             if unfollow['username'] not in whiteListUsers and count <= number:
